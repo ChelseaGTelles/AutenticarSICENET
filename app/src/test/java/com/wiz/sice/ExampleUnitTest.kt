@@ -1,4 +1,4 @@
-package com.example.autenticarsicenet
+package com.wiz.sice
 
 import org.junit.Test
 

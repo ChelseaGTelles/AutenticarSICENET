@@ -1,4 +1,4 @@
-package com.example.autenticarsicenet.ui.theme
+package com.wiz.sice.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

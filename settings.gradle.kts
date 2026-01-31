@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AutenticarSICENET"
+rootProject.name = "Sice"
 include(":app")
- 
