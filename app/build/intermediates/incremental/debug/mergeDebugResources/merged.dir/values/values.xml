@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="http://schemas.android.com/tools" xmlns:ns2="urn:oasis:names:tc:xliff:document:1.2">
-    <attr format="string" name="fontProviderSystemFontFamily"/>
-    <attr format="string" name="fontVariationSettings"/>
     <attr format="reference" name="nestedScrollViewStyle"/>
     <color name="androidx_core_ripple_material_light">#1f000000</color>
     <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
@@ -74,7 +72,6 @@
     <item name="accessibility_custom_action_8" type="id"/>
     <item name="accessibility_custom_action_9" type="id"/>
     <item name="androidx_compose_ui_view_composition_context" type="id"/>
-    <item name="compose_prefetch_scheduler" type="id"/>
     <item name="compose_view_saveable_id_tag" type="id"/>
     <item name="consume_window_insets_tag" type="id"/>
     <item name="hide_graphics_layer_in_inspector_tag" type="id"/>
@@ -90,13 +87,11 @@
     <item name="tag_accessibility_clickable_spans" type="id"/>
     <item name="tag_accessibility_heading" type="id"/>
     <item name="tag_accessibility_pane_title" type="id"/>
-    <item name="tag_compat_insets_dispatch" type="id"/>
     <item name="tag_on_apply_window_listener" type="id"/>
     <item name="tag_on_receive_content_listener" type="id"/>
     <item name="tag_on_receive_content_mime_types" type="id"/>
     <item name="tag_screen_reader_focusable" type="id"/>
     <item name="tag_state_description" type="id"/>
-    <item name="tag_system_bar_state_monitor" type="id"/>
     <item name="tag_transition_group" type="id"/>
     <item name="tag_unhandled_key_event_manager" type="id"/>
     <item name="tag_unhandled_key_listeners" type="id"/>
@@ -104,9 +99,7 @@
     <item name="text" type="id"/>
     <item name="text2" type="id"/>
     <item name="title" type="id"/>
-    <id name="view_tree_disjoint_parent"/>
     <id name="view_tree_lifecycle_owner"/>
-    <id name="view_tree_navigation_event_dispatcher_owner"/>
     <id name="view_tree_on_back_pressed_dispatcher_owner"/>
     <id name="view_tree_saved_state_registry_owner"/>
     <id name="view_tree_view_model_store_owner"/>
@@ -114,8 +107,7 @@
     <integer name="m3c_window_layout_in_display_cutout_mode">1</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="app_name">AutenticarSICENET</string>
-    <string name="autofill">Autofill</string>
+    <string name="app_name">Sice</string>
     <string name="call_notification_answer_action">Answer</string>
     <string name="call_notification_answer_video_action">Video</string>
     <string name="call_notification_decline_action">Decline</string>
@@ -196,7 +188,6 @@
     <string name="range_end">"Range end"</string>
     <string name="range_start">"Range start"</string>
     <string name="selected">Selected</string>
-    <string name="snackbar_pane_title">Alert</string>
     <string name="state_empty">Empty</string>
     <string name="state_off">Off</string>
     <string name="state_on">On</string>
@@ -222,9 +213,12 @@
     <style name="EdgeToEdgeFloatingDialogWindowTheme">
         <item name="android:dialogTheme">@style/EdgeToEdgeFloatingDialogTheme</item>
     </style>
+    <style name="FloatingDialogTheme">
+        <item name="android:windowIsFloating">false</item>
+    </style>
     <style name="FloatingDialogWindowTheme">
         <item name="android:windowClipToOutline">false</item>
-        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:dialogTheme">@style/FloatingDialogTheme</item>
     </style>
     <style name="TextAppearance.Compat.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
     <style name="TextAppearance.Compat.Notification.Info">
@@ -237,7 +231,7 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
     <style name="TextAppearance.Compat.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
-    <style name="Theme.AutenticarSICENET" parent="android:Theme.Material.Light.NoActionBar"/>
+    <style name="Theme.Sice" parent="android:Theme.Material.Light.NoActionBar"/>
     <style name="Widget.Compat.NotificationActionContainer" parent=""/>
     <style name="Widget.Compat.NotificationActionText" parent=""/>
     <declare-styleable name="ActivityNavigator">
@@ -296,7 +290,7 @@
             <enum name="forever" value="-1"/>
         </attr>
         
-        <attr name="fontProviderSystemFontFamily"/>
+        <attr format="string" name="fontProviderSystemFontFamily"/>
     </declare-styleable>
     <declare-styleable name="FontFamilyFont">
         
@@ -309,7 +303,7 @@
         
         <attr format="integer" name="fontWeight"/>
         
-        <attr name="fontVariationSettings"/>
+        <attr format="string" name="fontVariationSettings"/>
         
         <attr format="integer" name="ttcIndex"/>
         
@@ -318,14 +312,6 @@
         <attr name="android:fontWeight"/>
         <attr name="android:fontVariationSettings"/>
         <attr name="android:ttcIndex"/>
-    </declare-styleable>
-    <declare-styleable name="FontFamilyProviderFallback">
-        
-        <attr name="fontProviderQuery"/>
-        
-        <attr name="fontProviderSystemFontFamily"/>
-        
-        <attr name="fontVariationSettings"/>
     </declare-styleable>
     <declare-styleable name="GradientColor">
         

@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.autenticarsicenet.app-mergeDebugResources-37:/values-v30/values-v30.xml",
+            "outputFile": "com.wiz.sice.app-mergeDebugResources-50:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\chels\\.gradle\\caches\\8.13\\transforms\\8e78493df7fda4d7a98d4864ec1c3e90\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\chels\\.gradle\\caches\\9.1.0\\transforms\\7049980ef453467424667e4d20225c4c\\workspace\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

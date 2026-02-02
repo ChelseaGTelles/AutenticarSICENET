@@ -1,30 +1,38 @@
 package com.wiz.sice
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.unit.dp
-import com.wiz.sice.model.*
-import com.wiz.sice.network.SoapService
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.simpleframework.xml.core.Persister
-import retrofit2.*
-import java.io.StringWriter
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            SoapScreen()
+            SiceAppNavigation()
+        }
+    }
+}
+
+@Composable
+fun SiceAppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            SoapScreen(
+                onNavigateToProfile = {
+                    navController.navigate("profile") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("profile") {
+            ProfileScreen()
         }
     }
 }
