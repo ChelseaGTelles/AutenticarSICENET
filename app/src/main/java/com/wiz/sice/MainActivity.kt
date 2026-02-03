@@ -3,36 +3,19 @@ package com.wiz.sice
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.activity.enableEdgeToEdge
+import com.wiz.sice.ui.theme.SiceTheme
+import com.wiz.sice.ui.nav.SicenetApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            SiceAppNavigation()
+            SiceTheme {
+                SicenetApp()
+            }
         }
     }
 }
 
-@Composable
-fun SiceAppNavigation() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") {
-            SoapScreen(
-                onNavigateToProfile = {
-                    navController.navigate("profile") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                }
-            )
-        }
-        composable("profile") {
-            ProfileScreen()
-        }
-    }
-}

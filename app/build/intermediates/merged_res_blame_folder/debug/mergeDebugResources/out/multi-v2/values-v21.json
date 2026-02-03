@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.wiz.sice.app-mergeDebugResources-50:/values-v21/values-v21.xml",
+            "outputFile": "com.wiz.sice.app-mergeDebugResources-63:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\chels\\.gradle\\caches\\9.1.0\\transforms\\fae202fecfc333e72e14819d91e205a1\\workspace\\transformed\\core-1.15.0\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\barre\\.gradle\\caches\\9.1.0\\transforms\\b09fdc8043d7f53d9f0a7d4f47baa70e\\workspace\\transformed\\core-1.15.0\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
