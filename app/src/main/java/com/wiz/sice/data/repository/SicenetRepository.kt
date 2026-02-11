@@ -1,16 +1,15 @@
 package com.wiz.sice.data.repository
 
 import android.util.Log
+import com.wiz.sice.data.*
 import com.wiz.sice.data.api.SicenetApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import java.util.concurrent.TimeUnit
@@ -44,42 +43,20 @@ class SicenetRepository {
 
     private val api = retrofit.create(SicenetApi::class.java)
 
-    private fun escapeXml(text: String): String {
-        return text.replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("\"", "&quot;")
-            .replace("'", "&apos;")
-    }
-
     suspend fun accesoLogin(matricula: String, contrasenia: String, userType: String): Result<String> = withContext(Dispatchers.IO) {
         try {
-
             val preRequest = Request.Builder().url("https://sicenet.surguanajuato.tecnm.mx/ws/wsalumnos.asmx").build()
             cliente.newCall(preRequest).execute().close()
 
-            val soapRequest = """
-                <?xml version="1.0" encoding="utf-8"?>
-                <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                  <soap:Body>
-                    <accesoLogin xmlns="http://tempuri.org/">
-                      <strMatricula>${escapeXml(matricula)}</strMatricula>
-                      <strContrasenia>${escapeXml(contrasenia)}</strContrasenia>
-                      <tipoUsuario>${escapeXml(userType)}</tipoUsuario>
-                    </accesoLogin>
-                  </soap:Body>
-                </soap:Envelope>
-            """.trim()
-
-            val requestBody = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
-            val response = api.accesoLogin("http://tempuri.org/accesoLogin", requestBody)
+            val envelope = LoginEnvelope(LoginBody(AccesoLoginRequest(matricula, contrasenia, userType)))
+            val response = api.accesoLogin("http://tempuri.org/accesoLogin", envelope)
 
             if (response.isSuccessful) {
                 val result = response.body()?.result
                 if (!result.isNullOrBlank()) {
                     Result.success(result)
                 } else {
-                    Result.failure(Exception("Respuesta vacía del servidor"))
+                    Result.failure(Exception("Credenciales incorrectas o respuesta vacía"))
                 }
             } else {
                 Result.failure(Exception("Error HTTP ${response.code()}"))
@@ -92,27 +69,18 @@ class SicenetRepository {
 
     suspend fun getAlumno(): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val soapRequest = """
-                <?xml version="1.0" encoding="utf-8"?>
-                <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                  <soap:Body>
-                    <getAlumnoAcademicoWithLineamiento xmlns="http://tempuri.org/" />
-                  </soap:Body>
-                </soap:Envelope>
-            """.trim()
-
-            val requestBody = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
-            val response = api.getAlumno("http://tempuri.org/getAlumnoAcademicoWithLineamiento", requestBody)
+            val envelope = PerfilEnvelope(PerfilBody(GetAlumnoRequest()))
+            val response = api.getAlumno("http://tempuri.org/getAlumnoAcademicoWithLineamiento", envelope)
 
             if (response.isSuccessful) {
                 val result = response.body()?.result
                 if (!result.isNullOrBlank()) {
                     Result.success(result)
                 } else {
-                    Result.failure(Exception("No se pudo obtener la información"))
+                    Result.failure(Exception("No se pudo obtener la información del alumno"))
                 }
             } else {
-                Result.failure(Exception("Error al consultar perfil"))
+                Result.failure(Exception("Error al consultar perfil: ${response.code()}"))
             }
         } catch (e: Exception) {
             Log.e("SicenetRepo", "Error en perfil", e)

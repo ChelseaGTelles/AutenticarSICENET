@@ -1,8 +1,6 @@
 package com.wiz.sice.data.api
 
-import com.wiz.sice.data.AlumnoResponseEnvelope
-import com.wiz.sice.data.LoginResponseEnvelope
-import okhttp3.RequestBody
+import com.wiz.sice.data.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -14,13 +12,13 @@ interface SicenetApi {
     @POST("ws/wsalumnos.asmx")
     suspend fun accesoLogin(
         @Header("SOAPAction") soapAction: String,
-        @Body body: RequestBody
+        @Body body: LoginEnvelope
     ): Response<LoginResponseEnvelope>
 
     @Headers("Content-Type: text/xml; charset=utf-8")
     @POST("ws/wsalumnos.asmx")
     suspend fun getAlumno(
         @Header("SOAPAction") soapAction: String,
-        @Body body: RequestBody
+        @Body body: PerfilEnvelope
     ): Response<AlumnoResponseEnvelope>
 }
