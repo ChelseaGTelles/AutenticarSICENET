@@ -50,7 +50,7 @@ fun PerfilScreen(viewModel: SicenetViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF28a745)) // Green color
+                    .background(Color(0xFF28a745))
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {

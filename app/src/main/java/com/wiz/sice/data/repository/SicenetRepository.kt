@@ -1,6 +1,7 @@
 package com.wiz.sice.data.repository
 
 import android.util.Log
+import com.wiz.sice.data.api.SicenetApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Cookie
@@ -10,6 +11,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Retrofit
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import java.util.concurrent.TimeUnit
 
 class SicenetRepository {
@@ -31,11 +34,15 @@ class SicenetRepository {
         })
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
-        .followRedirects(true)
-        .followSslRedirects(true)
         .build()
 
-    private val baseUrl = "https://sicenet.surguanajuato.tecnm.mx/ws/wsalumnos.asmx"
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://sicenet.surguanajuato.tecnm.mx/")
+        .client(cliente)
+        .addConverterFactory(SimpleXmlConverterFactory.create())
+        .build()
+
+    private val api = retrofit.create(SicenetApi::class.java)
 
     private fun escapeXml(text: String): String {
         return text.replace("&", "&amp;")
@@ -45,17 +52,11 @@ class SicenetRepository {
             .replace("'", "&apos;")
     }
 
-    private fun extractTagContent(xml: String, tagName: String): String? {
-        val pattern = "<(?:\\w+:)?$tagName(?:\\s+[^>]*)?>(.*?)</(?:\\w+:)?$tagName>".toRegex(RegexOption.DOT_MATCHES_ALL)
-        return pattern.find(xml)?.groupValues?.get(1)
-    }
-
     suspend fun accesoLogin(matricula: String, contrasenia: String, userType: String): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val preRequest = Request.Builder().url(baseUrl).build()
-            cliente.newCall(preRequest).execute().use { response ->
-                Log.d("SicenetRepo", "Pre-request status: ${response.code}")
-            }
+
+            val preRequest = Request.Builder().url("https://sicenet.surguanajuato.tecnm.mx/ws/wsalumnos.asmx").build()
+            cliente.newCall(preRequest).execute().close()
 
             val soapRequest = """
                 <?xml version="1.0" encoding="utf-8"?>
@@ -70,30 +71,21 @@ class SicenetRepository {
                 </soap:Envelope>
             """.trim()
 
-            val body = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
-            val request = Request.Builder()
-                .url(baseUrl)
-                .post(body)
-                .addHeader("SOAPAction", "\"http://tempuri.org/accesoLogin\"")
-                .build()
+            val requestBody = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
+            val response = api.accesoLogin("http://tempuri.org/accesoLogin", requestBody)
 
-
-            cliente.newCall(request).execute().use { response ->
-                val responseBody = response.body?.string() ?: ""
-                Log.d("SicenetRepo", "Status: ${response.code}")
-                Log.d("SicenetRepo", "Body: $responseBody")
-
-                if (!response.isSuccessful) return@withContext Result.failure(Exception("Error HTTP ${response.code}"))
-
-                val result = extractTagContent(responseBody, "accesoLoginResult")
-                if (result != null) {
+            if (response.isSuccessful) {
+                val result = response.body()?.result
+                if (!result.isNullOrBlank()) {
                     Result.success(result)
                 } else {
-                    Result.failure(Exception("Verifique credenciales."))
+                    Result.failure(Exception("Respuesta vacía del servidor"))
                 }
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
             }
         } catch (e: Exception) {
-            Log.e("SicenetRepo", "Excepción", e)
+            Log.e("SicenetRepo", "Error en login", e)
             Result.failure(e)
         }
     }
@@ -109,23 +101,21 @@ class SicenetRepository {
                 </soap:Envelope>
             """.trim()
 
-            val body = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
-            val request = Request.Builder()
-                .url(baseUrl)
-                .post(body)
-                .addHeader("SOAPAction", "\"http://tempuri.org/getAlumnoAcademicoWithLineamiento\"")
-                .build()
+            val requestBody = soapRequest.toRequestBody("text/xml; charset=utf-8".toMediaType())
+            val response = api.getAlumno("http://tempuri.org/getAlumnoAcademicoWithLineamiento", requestBody)
 
-            cliente.newCall(request).execute().use { response ->
-                val responseBody = response.body?.string() ?: ""
-                val result = extractTagContent(responseBody, "getAlumnoAcademicoWithLineamientoResult")
-                if (result != null) {
+            if (response.isSuccessful) {
+                val result = response.body()?.result
+                if (!result.isNullOrBlank()) {
                     Result.success(result)
                 } else {
-                    Result.failure(Exception("No se puede cargar el perfil"))
+                    Result.failure(Exception("No se pudo obtener la información"))
                 }
+            } else {
+                Result.failure(Exception("Error al consultar perfil"))
             }
         } catch (e: Exception) {
+            Log.e("SicenetRepo", "Error en perfil", e)
             Result.failure(e)
         }
     }
