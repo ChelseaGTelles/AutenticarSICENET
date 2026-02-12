@@ -62,7 +62,7 @@ fun LoginScreen(viewModel: SicenetViewModel, onLoginSuccess: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF28a745)) // Green color
+                    .background(Color(0xFF062970))
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -135,7 +135,7 @@ fun LoginScreen(viewModel: SicenetViewModel, onLoginSuccess: () -> Unit) {
                     onClick = { viewModel.login(matricula, contrasenia, userType) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = uiState !is SicenetUiState.Loading,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF28a745)) // Green color
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF062970))
                 ) {
                     if (uiState is SicenetUiState.Loading) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))

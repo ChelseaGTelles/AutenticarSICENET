@@ -22,8 +22,6 @@ class LoginBody(
     var method: AccesoLoginRequest? = null
 )
 
-
-
 @Root(name = "soap:Envelope")
 @NamespaceList(
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),

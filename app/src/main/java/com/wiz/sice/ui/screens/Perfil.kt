@@ -50,7 +50,7 @@ fun PerfilScreen(viewModel: SicenetViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF28a745))
+                    .background(Color(0xFF062970))
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -75,7 +75,7 @@ fun PerfilScreen(viewModel: SicenetViewModel) {
                     }
                     is SicenetUiState.ProfileLoaded -> {
                         val json = try {
-                            JSONObject(state.profileData)
+                            JSONObject(state.profile.rawJson)
                         } catch (e: Exception) {
                             null
                         }
