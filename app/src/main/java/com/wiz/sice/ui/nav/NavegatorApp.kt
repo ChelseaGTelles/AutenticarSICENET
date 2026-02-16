@@ -33,16 +33,16 @@ fun SicenetApp() {
             )
         }
         composable("calificaciones_unidad") { 
-            CalificacionesPorUnidadScreen(onBack = { navController.popBackStack() }) 
+            CalificacionesPorUnidadScreen(viewModel = viewModel, onBack = { navController.popBackStack() }) 
         }
         composable("calificaciones_finales") { 
-            CalificacionesFinalesScreen(onBack = { navController.popBackStack() }) 
+            CalificacionesFinalesScreen(viewModel = viewModel, onBack = { navController.popBackStack() }) 
         }
         composable("kardex") { 
-            KardexScreen(onBack = { navController.popBackStack() }) 
+            KardexScreen(viewModel = viewModel, onBack = { navController.popBackStack() }) 
         }
         composable("carga_academica") { 
-            CargaAcademicaScreen(onBack = { navController.popBackStack() }) 
+            CargaAcademicaScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
         }
     }
 }

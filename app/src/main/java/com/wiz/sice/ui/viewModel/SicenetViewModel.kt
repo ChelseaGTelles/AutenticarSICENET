@@ -16,6 +16,7 @@ sealed class SicenetUiState {
     object Loading : SicenetUiState()
     data class Success(val loginResult: LoginResult) : SicenetUiState()
     data class ProfileLoaded(val profile: AlumnoProfile) : SicenetUiState()
+    data class DataLoaded(val type: String, val content: String) : SicenetUiState()
     data class Error(val message: String) : SicenetUiState()
 }
 
@@ -47,6 +48,50 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
                 _uiState.value = SicenetUiState.ProfileLoaded(profile)
             }.onFailure {
                 _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener perfil")
+            }
+        }
+    }
+
+    fun getCarga() {
+        viewModelScope.launch {
+            _uiState.value = SicenetUiState.Loading
+            repository.getCargaAcademicaByAlumno().onSuccess { result ->
+                _uiState.value = SicenetUiState.DataLoaded("CARGA", result)
+            }.onFailure {
+                _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener carga académica")
+            }
+        }
+    }
+
+    fun getKardex(lineamiento: Int) {
+        viewModelScope.launch {
+            _uiState.value = SicenetUiState.Loading
+            repository.getAllKardexConPromedioByAlumno(lineamiento).onSuccess { result ->
+                _uiState.value = SicenetUiState.DataLoaded("KARDEX", result)
+            }.onFailure {
+                _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener kardex")
+            }
+        }
+    }
+
+    fun getCalifUnidades() {
+        viewModelScope.launch {
+            _uiState.value = SicenetUiState.Loading
+            repository.getCalifUnidadesByAlumno().onSuccess { result ->
+                _uiState.value = SicenetUiState.DataLoaded("UNIDADES", result)
+            }.onFailure {
+                _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener calificaciones por unidad")
+            }
+        }
+    }
+
+    fun getCalifFinales(modEducativo: Int) {
+        viewModelScope.launch {
+            _uiState.value = SicenetUiState.Loading
+            repository.getAllCalifFinalByAlumnos(modEducativo).onSuccess { result ->
+                _uiState.value = SicenetUiState.DataLoaded("FINALES", result)
+            }.onFailure {
+                _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener calificaciones finales")
             }
         }
     }

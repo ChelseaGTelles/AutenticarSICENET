@@ -21,4 +21,32 @@ interface SicenetApi {
         @Header("SOAPAction") soapAction: String,
         @Body body: PerfilEnvelope
     ): Response<AlumnoResponseEnvelope>
+
+    @Headers("Content-Type: text/xml; charset=utf-8")
+    @POST("ws/wsalumnos.asmx")
+    suspend fun getCarga(
+        @Header("SOAPAction") soapAction: String,
+        @Body body: CargaEnvelope
+    ): Response<CargaResponseEnvelope>
+
+    @Headers("Content-Type: text/xml; charset=utf-8")
+    @POST("ws/wsalumnos.asmx")
+    suspend fun getKardex(
+        @Header("SOAPAction") soapAction: String,
+        @Body body: KardexEnvelope
+    ): Response<KardexResponseEnvelope>
+
+    @Headers("Content-Type: text/xml; charset=utf-8")
+    @POST("ws/wsalumnos.asmx")
+    suspend fun getCalifUnidades(
+        @Header("SOAPAction") soapAction: String,
+        @Body body: CalifUnidadesEnvelope
+    ): Response<CalifUnidadesResponseEnvelope>
+
+    @Headers("Content-Type: text/xml; charset=utf-8")
+    @POST("ws/wsalumnos.asmx")
+    suspend fun getCalifFinal(
+        @Header("SOAPAction") soapAction: String,
+        @Body body: CalifFinalEnvelope
+    ): Response<CalifFinalResponseEnvelope>
 }

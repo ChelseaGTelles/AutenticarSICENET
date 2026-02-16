@@ -115,4 +115,60 @@ class SicenetRepository : InterfaceRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun getAllCalifFinalByAlumnos(modEducativo: Int): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val envelope = CalifFinalEnvelope(CalifFinalBody(GetCalifFinalRequest(modEducativo)))
+            val response = api.getCalifFinal("http://tempuri.org/getAllCalifFinalByAlumnos", envelope)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.result ?: "")
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCalifUnidadesByAlumno(): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val envelope = CalifUnidadesEnvelope(CalifUnidadesBody(GetCalifUnidadesRequest()))
+            val response = api.getCalifUnidades("http://tempuri.org/getCalifUnidadesByAlumno", envelope)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.result ?: "")
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllKardexConPromedioByAlumno(aluLineamiento: Int): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val envelope = KardexEnvelope(KardexBody(GetKardexRequest(aluLineamiento)))
+            val response = api.getKardex("http://tempuri.org/getAllKardexConPromedioByAlumno", envelope)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.result ?: "")
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCargaAcademicaByAlumno(): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val envelope = CargaEnvelope(CargaBody(GetCargaRequest()))
+            val response = api.getCarga("http://tempuri.org/getCargaAcademicaByAlumno", envelope)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.result ?: "")
+            } else {
+                Result.failure(Exception("Error HTTP ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
