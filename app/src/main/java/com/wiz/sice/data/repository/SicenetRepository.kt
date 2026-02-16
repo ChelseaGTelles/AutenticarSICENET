@@ -26,13 +26,10 @@ class SicenetRepository : InterfaceRepository {
             override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
                 val hostCookies = cookieMap.getOrPut(url.host) { mutableMapOf() }
                 cookies.forEach { cookie -> hostCookies[cookie.name] = cookie }
-                Log.d("SicenetRepo", "Cookies guardadas para ${url.host}: ${cookies.map { it.name }}")
             }
 
             override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                val cookies = cookieMap[url.host]?.values?.toList() ?: listOf()
-                Log.d("SicenetRepo", "Enviando ${cookies.size} cookies a ${url.host}")
-                return cookies
+                return cookieMap[url.host]?.values?.toList() ?: listOf()
             }
         })
         .connectTimeout(60, TimeUnit.SECONDS)
@@ -50,7 +47,6 @@ class SicenetRepository : InterfaceRepository {
 
     override fun logout() {
         cookieMap.clear()
-        Log.d("SicenetRepo", "Sesión cerrada: cookies eliminadas")
     }
 
     private suspend fun keepAlive() {
@@ -70,14 +66,12 @@ class SicenetRepository : InterfaceRepository {
 
             if (response.isSuccessful) {
                 val res = response.body()?.result
-                Log.d("SicenetRepo", "Login Result: $res")
                 if (!res.isNullOrBlank()) {
                     val isSuccess = res.contains("\"acceso\":true") || res == "1"
                     Result.success(LoginResult(acceso = isSuccess, mensaje = if (isSuccess) "OK" else "Denegado", rawResponse = res))
                 } else Result.failure(Exception("Respuesta de login vacía"))
             } else Result.failure(Exception("HTTP ${response.code()} en Login"))
         } catch (e: Exception) {
-            Log.e("SicenetRepo", "Error en login", e)
             Result.failure(e)
         }
     }
@@ -90,7 +84,6 @@ class SicenetRepository : InterfaceRepository {
 
             if (response.isSuccessful) {
                 val res = response.body()?.result
-                Log.d("SicenetRepo", "Perfil Result: $res")
                 if (!res.isNullOrBlank()) {
                     val json = JSONObject(res)
                     val profile = AlumnoProfile(
@@ -116,7 +109,6 @@ class SicenetRepository : InterfaceRepository {
                 } else Result.failure(Exception("Perfil vacío"))
             } else Result.failure(Exception("HTTP ${response.code()} en Perfil"))
         } catch (e: Exception) {
-            Log.e("SicenetRepo", "Error en perfil", e)
             Result.failure(e)
         }
     }
@@ -129,9 +121,10 @@ class SicenetRepository : InterfaceRepository {
             val res = response.body()?.result
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
+                    val calif = json.optString("calificacionFinal", json.optString("Promedio", json.optString("calif", "0")))
                     CalifFinalItem(
                         materia = json.optString("materia", json.optString("Materia", "N/A")),
-                        calificacionFinal = json.optString("calificacionFinal", json.optString("Promedio", "N/A"))
+                        calificacionFinal = if (calif == "null" || calif.isEmpty()) "0" else calif
                     )
                 }
                 Result.success(list)
@@ -148,10 +141,13 @@ class SicenetRepository : InterfaceRepository {
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
                     val units = mutableMapOf<Int, String>()
-                    for (i in 1..10) {
-                        val valUnit = json.optString("C$i", "")
-                        if (valUnit.isNotEmpty() && valUnit != "null") {
-                            units[i] = valUnit
+                    for (i in 1..13) {
+                        val key = if (json.has("C$i")) "C$i" else "unidad$i"
+                        if (json.has(key)) {
+                            val valUnit = json.optString(key, "").trim()
+                            if (valUnit.isNotEmpty() && valUnit != "null") {
+                                units[i] = valUnit
+                            }
                         }
                     }
                     CalifUnidadItem(
@@ -172,11 +168,12 @@ class SicenetRepository : InterfaceRepository {
             val res = response.body()?.result
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
+                    val calif = json.optString("promedio", json.optString("Promedio", json.optString("calif", "0")))
                     KardexItem(
                         clvOficial = json.optString("clvOficial", json.optString("ClvOficial", "N/A")),
                         materia = json.optString("materia", json.optString("Materia", "N/A")),
                         periodo = json.optString("periodo", json.optString("Periodo", "N/A")),
-                        promedio = json.optString("promedio", json.optString("Promedio", "N/A"))
+                        promedio = if (calif == "null" || calif.isEmpty()) "0" else calif
                     )
                 }
                 Result.success(list)

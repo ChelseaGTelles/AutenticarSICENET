@@ -29,7 +29,7 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Kardex Académico", color = Color.White) },
+                title = { Text("Cardex Académico", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Regresar", tint = Color.White)
@@ -48,19 +48,23 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
                 }
                 is SicenetUiState.KardexLoaded -> {
                     if (state.items.isNotEmpty()) {
-                        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             items(state.items) { item ->
                                 KardexCard(item)
                             }
                         }
                     } else {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(text = "No se encontraron registros en el Kardex.", color = Color.Gray)
+                            Text("No se encontraron registros en el Kardex.", color = Color.Gray)
                         }
                     }
                 }
                 is SicenetUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(text = state.message, color = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -73,17 +77,31 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
 @Composable
 fun KardexCard(item: KardexItem) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = item.clvOficial, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                Text(text = item.periodo, fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Medium)
+                Text(
+                    text = item.clvOficial,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = item.periodo,
+                    fontSize = 12.sp,
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.Medium
+                )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = item.materia, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF062970))
-            
+            Text(
+                text = item.materia,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                color = Color(0xFF062970)
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Text(text = "Calificación: ", fontSize = 14.sp)

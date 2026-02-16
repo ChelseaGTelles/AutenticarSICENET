@@ -29,21 +29,23 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    
-    // Sincronizamos Kotlin con Java 11 para evitar el error de inconsistencia
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
-    buildFeatures {
-        compose = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
-// Configuración necesaria para que Room genere código Kotlin puro y evitar conflictos de firma JVM
+/**
+ * Configuración del Toolchain para sincronizar todas las tareas de compilación a Java 17.
+ * Esto soluciona los conflictos de JVM Target entre Kotlin, KSP y Java.
+ */
+kotlin {
+    jvmToolchain(17)
+}
+
+/**
+ * Configuración de KSP para Room.
+ * Forzamos la generación de código Kotlin puro para evitar el error 'unexpected jvm signature V'.
+ */
 ksp {
     arg("room.generateKotlin", "true")
 }
@@ -58,6 +60,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.simpleframework:simple-xml:2.7.1")
     implementation("com.squareup.retrofit2:converter-simplexml:2.9.0")
+    
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -69,6 +72,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.ads.mobile.sdk)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

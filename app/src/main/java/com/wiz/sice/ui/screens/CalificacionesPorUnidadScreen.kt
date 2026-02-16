@@ -82,12 +82,12 @@ fun UnidadMateriaCard(item: CalifUnidadItem) {
                 color = Color(0xFF062970)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                item.unidades.forEach { (num, calif) ->
+                item.unidades.toSortedMap().forEach { (num, calif) ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = "U$num", fontSize = 12.sp, color = Color.Gray)
                         Text(text = calif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
