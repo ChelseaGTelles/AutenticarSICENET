@@ -5,8 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.wiz.sice.ui.screens.LoginScreen
-import com.wiz.sice.ui.screens.PerfilScreen
+import com.wiz.sice.ui.screens.*
 import com.wiz.sice.ui.viewModel.SicenetViewModel
 
 @Composable
@@ -23,7 +22,27 @@ fun SicenetApp() {
             })
         }
         composable("profile") {
-            PerfilScreen(viewModel)
+            PerfilScreen(
+                viewModel = viewModel,
+                onNavigate = { route -> navController.navigate(route) },
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo("profile") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("calificaciones_unidad") { 
+            CalificacionesPorUnidadScreen(onBack = { navController.popBackStack() }) 
+        }
+        composable("calificaciones_finales") { 
+            CalificacionesFinalesScreen(onBack = { navController.popBackStack() }) 
+        }
+        composable("kardex") { 
+            KardexScreen(onBack = { navController.popBackStack() }) 
+        }
+        composable("carga_academica") { 
+            CargaAcademicaScreen(onBack = { navController.popBackStack() }) 
         }
     }
 }

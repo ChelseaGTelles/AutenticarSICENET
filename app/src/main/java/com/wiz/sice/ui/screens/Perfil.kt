@@ -1,66 +1,97 @@
 package com.wiz.sice.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.wiz.sice.data.models.AlumnoProfile
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
-import org.json.JSONObject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(viewModel: SicenetViewModel) {
+fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLogout: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
+    var showMenu by remember { mutableStateOf(false) }
 
+    // Corregido: Llamar a getProfile si no hemos cargado el perfil aún
     LaunchedEffect(Unit) {
-        viewModel.getProfile()
+        if (uiState !is SicenetUiState.ProfileLoaded) {
+            viewModel.getProfile()
+        }
     }
 
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Perfil", color = Color.White) },
+                actions = {
+                    IconButton(onClick = onLogout) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Cerrar Sesión",
+                            tint = Color.White
+                        )
+                    }
+                    
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "Menú", tint = Color.White)
+                    }
+                    
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Calificaciones Por Unidad") },
+                            onClick = {
+                                showMenu = false
+                                onNavigate("calificaciones_unidad")
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Calificaciones Finales") },
+                            onClick = {
+                                showMenu = false
+                                onNavigate("calificaciones_finales")
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Kardex") },
+                            onClick = {
+                                showMenu = false
+                                onNavigate("kardex")
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Carga Académica") },
+                            onClick = {
+                                showMenu = false
+                                onNavigate("carga_academica")
+                            }
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF062970))
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF062970))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Perfil",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -71,25 +102,20 @@ fun PerfilScreen(viewModel: SicenetViewModel) {
 
                 when (val state = uiState) {
                     is SicenetUiState.Loading -> {
-                        CircularProgressIndicator()
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
                     is SicenetUiState.ProfileLoaded -> {
-                        val json = try {
-                            JSONObject(state.profile.rawJson)
-                        } catch (e: Exception) {
-                            null
-                        }
-
-                        if (json != null) {
-                            ProfileData(json)
-                        } else {
-                            Text("Error al parsear los datos del perfil.")
-                        }
+                        ProfileDataDisplay(state.profile)
                     }
                     is SicenetUiState.Error -> {
-                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
-                        Button(onClick = { viewModel.getProfile() }) {
-                            Text("Reintentar")
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { viewModel.getProfile() }) {
+                                Text("Reintentar")
+                            }
                         }
                     }
                     else -> {}
@@ -100,36 +126,49 @@ fun PerfilScreen(viewModel: SicenetViewModel) {
 }
 
 @Composable
-fun ProfileData(json: JSONObject) {
+fun ProfileDataDisplay(profile: AlumnoProfile) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            val keys = json.keys().asSequence().toList()
-            keys.forEachIndexed { index, key ->
-                val value = json.optString(key, "N/A")
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "${key.replaceFirstChar { it.uppercase() }}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        modifier = Modifier.weight(0.4f)
-                    )
-                    Text(
-                        text = value,
-                        fontSize = 16.sp,
-                        modifier = Modifier.weight(0.6f)
-                    )
-                }
-                if (index < keys.size - 1) {
-                    Divider()
-                }
-            }
+            ProfileItem("FechaReins", profile.fechaReins)
+            ProfileItem("ModEducativo", profile.modEducativo)
+            ProfileItem("Adeudo", profile.adeudo.toString())
+            ProfileItem("UrlFoto", profile.urlFoto)
+            ProfileItem("AdeudoDescripcion", profile.adeudoDescripcion)
+            ProfileItem("Inscrito", profile.inscrito.toString())
+            ProfileItem("Estatus", profile.estatus)
+            ProfileItem("SemActual", profile.semActual)
+            ProfileItem("CdtosAcumulados", profile.cdtosAcumulados)
+            ProfileItem("CdtosActuales", profile.cdtosActuales)
+            ProfileItem("Especialidad", profile.especialidad)
+            ProfileItem("Carrera", profile.carrera)
+            ProfileItem("Lineamiento", profile.lineamiento)
+            ProfileItem("Nombre", profile.nombre)
+            ProfileItem("Matricula", profile.matricula)
         }
     }
+}
+
+@Composable
+fun ProfileItem(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(
+            text = label,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(0.4f)
+        )
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            modifier = Modifier.weight(0.6f)
+        )
+    }
+    HorizontalDivider()
 }

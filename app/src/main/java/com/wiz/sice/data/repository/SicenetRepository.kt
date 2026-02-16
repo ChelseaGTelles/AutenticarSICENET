@@ -86,6 +86,18 @@ class SicenetRepository : InterfaceRepository {
                             nombre = json.optString("nombre"),
                             carrera = json.optString("carrera"),
                             situacion = json.optString("situacion"),
+                            fechaReins = json.optString("fechaReins"),
+                            modEducativo = json.optString("modEducativo"),
+                            adeudo = json.optBoolean("adeudo"),
+                            urlFoto = json.optString("urlFoto"),
+                            adeudoDescripcion = json.optString("adeudoDescripcion"),
+                            inscrito = json.optBoolean("inscrito"),
+                            estatus = json.optString("estatus"),
+                            semActual = json.optString("semActual"),
+                            cdtosAcumulados = json.optString("cdtosAcumulados"),
+                            cdtosActuales = json.optString("cdtosActuales"),
+                            especialidad = json.optString("especialidad"),
+                            lineamiento = json.optString("lineamiento"),
                             rawJson = resultString
                         )
                         Result.success(profile)
