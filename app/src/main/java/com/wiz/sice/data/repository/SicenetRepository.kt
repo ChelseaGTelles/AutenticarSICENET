@@ -21,21 +21,27 @@ class SicenetRepository : InterfaceRepository {
 
     private val cliente: OkHttpClient = OkHttpClient.Builder()
         .cookieJar(object : CookieJar {
-            private val cookie = mutableMapOf<String, List<Cookie>>()
+            private val cookieMap = mutableMapOf<String, MutableMap<String, Cookie>>()
 
             override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-                Log.d("SicenetRepo", "Guardando cookies: $cookies")
-                cookie[url.host] = cookies
+                val hostCookies = cookieMap.getOrPut(url.host) { mutableMapOf() }
+                cookies.forEach { cookie ->
+                    hostCookies[cookie.name] = cookie
+                }
+                Log.d("SicenetRepo", "Cookies actualizadas para ${url.host}: ${hostCookies.size} cookies activas")
             }
 
             override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                val cookies = cookie[url.host] ?: listOf()
-                Log.d("SicenetRepo", "Cargando cookies para ${url.host}: $cookies")
+                val cookies = cookieMap[url.host]?.values?.toList() ?: listOf()
+                Log.d("SicenetRepo", "Cargando ${cookies.size} cookies para ${url.host}")
                 return cookies
             }
         })
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .followSslRedirects(true)
         .build()
 
     private val retrofit = Retrofit.Builder()
@@ -46,11 +52,18 @@ class SicenetRepository : InterfaceRepository {
 
     private val api = retrofit.create(SicenetApi::class.java)
 
+    private suspend fun keepAlive() {
+        try {
+            val request = Request.Builder().url("https://sicenet.surguanajuato.tecnm.mx/ws/wsalumnos.asmx").build()
+            cliente.newCall(request).execute().close()
+        } catch (e: Exception) {
+            Log.e("SicenetRepo", "Error en KeepAlive", e)
+        }
+    }
+
     override suspend fun accesoLogin(request: AccesoLoginRequest): Result<LoginResult> = withContext(Dispatchers.IO) {
         try {
-            val preRequest = Request.Builder().url("https://sicenet.surguanajuato.tecnm.mx/ws/wsalumnos.asmx").build()
-            cliente.newCall(preRequest).execute().close()
-
+            keepAlive()
             val envelope = LoginEnvelope(LoginBody(request))
             val response = api.accesoLogin("http://tempuri.org/accesoLogin", envelope)
 
@@ -73,6 +86,7 @@ class SicenetRepository : InterfaceRepository {
 
     override suspend fun getAlumno(): Result<AlumnoProfile> = withContext(Dispatchers.IO) {
         try {
+            keepAlive()
             val envelope = PerfilEnvelope(PerfilBody(GetAlumnoRequest()))
             val response = api.getAlumno("http://tempuri.org/getAlumnoAcademicoWithLineamiento", envelope)
 
@@ -118,6 +132,7 @@ class SicenetRepository : InterfaceRepository {
 
     override suspend fun getAllCalifFinalByAlumnos(modEducativo: Int): Result<String> = withContext(Dispatchers.IO) {
         try {
+            keepAlive()
             val envelope = CalifFinalEnvelope(CalifFinalBody(GetCalifFinalRequest(modEducativo)))
             val response = api.getCalifFinal("http://tempuri.org/getAllCalifFinalByAlumnos", envelope)
             if (response.isSuccessful) {
@@ -132,6 +147,7 @@ class SicenetRepository : InterfaceRepository {
 
     override suspend fun getCalifUnidadesByAlumno(): Result<String> = withContext(Dispatchers.IO) {
         try {
+            keepAlive()
             val envelope = CalifUnidadesEnvelope(CalifUnidadesBody(GetCalifUnidadesRequest()))
             val response = api.getCalifUnidades("http://tempuri.org/getCalifUnidadesByAlumno", envelope)
             if (response.isSuccessful) {
@@ -146,6 +162,7 @@ class SicenetRepository : InterfaceRepository {
 
     override suspend fun getAllKardexConPromedioByAlumno(aluLineamiento: Int): Result<String> = withContext(Dispatchers.IO) {
         try {
+            keepAlive()
             val envelope = KardexEnvelope(KardexBody(GetKardexRequest(aluLineamiento)))
             val response = api.getKardex("http://tempuri.org/getAllKardexConPromedioByAlumno", envelope)
             if (response.isSuccessful) {
@@ -160,6 +177,7 @@ class SicenetRepository : InterfaceRepository {
 
     override suspend fun getCargaAcademicaByAlumno(): Result<String> = withContext(Dispatchers.IO) {
         try {
+            keepAlive()
             val envelope = CargaEnvelope(CargaBody(GetCargaRequest()))
             val response = api.getCarga("http://tempuri.org/getCargaAcademicaByAlumno", envelope)
             if (response.isSuccessful) {
