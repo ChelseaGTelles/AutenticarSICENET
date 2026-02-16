@@ -119,12 +119,17 @@ class SicenetRepository : InterfaceRepository {
             val envelope = CalifFinalEnvelope(CalifFinalBody(GetCalifFinalRequest(modEducativo)))
             val response = api.getCalifFinal("http://tempuri.org/getAllCalifFinalByAlumnos", envelope)
             val res = response.body()?.result
+            Log.d("SicenetRepo", "Response: $res")
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
-                    val calif = json.optString("calificacionFinal", json.optString("Promedio", json.optString("calif", "0")))
+                    val calif = json.optString("calif")
                     CalifFinalItem(
-                        materia = json.optString("materia", json.optString("Materia", "N/A")),
-                        calificacionFinal = if (calif == "null" || calif.isEmpty()) "0" else calif
+                        materia = json.optString("materia"),
+                        calif = if (calif == "null" || calif.isEmpty()) "0" else calif,
+                        acred = json.optString("acred"),
+                        grupo = json.optString("grupo"),
+                        Observaciones = json.optString(json.optString("Observaciones")
+                        )
                     )
                 }
                 Result.success(list)
@@ -151,8 +156,9 @@ class SicenetRepository : InterfaceRepository {
                         }
                     }
                     CalifUnidadItem(
-                        materia = json.optString("materia", json.optString("Materia", "N/A")),
-                        unidades = units
+                        Materia = json.optString("Materia"),
+                        unidades = units,
+                        Grupo = json.optString("Grupo")
                     )
                 }
                 Result.success(list)
@@ -168,12 +174,22 @@ class SicenetRepository : InterfaceRepository {
             val res = response.body()?.result
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
-                    val calif = json.optString("promedio", json.optString("Promedio", json.optString("calif", "0")))
+                    val cve = json.optString("ClvMat")
+                    val oficial = json.optString("ClvOfiMat")
+
+                    val clvOficialValue = if (cve.isNotBlank() && oficial.isNotBlank()) {
+                        "$cve-$oficial"
+                    } else {
+                        json.optString("N/A")
+                    }
+
+                    val calif = json.optString("Calif")
+                    val periodo = json.optString("S1")
                     KardexItem(
-                        clvOficial = json.optString("clvOficial", json.optString("ClvOficial", "N/A")),
-                        materia = json.optString("materia", json.optString("Materia", "N/A")),
-                        periodo = json.optString("periodo", json.optString("Periodo", "N/A")),
-                        promedio = if (calif == "null" || calif.isEmpty()) "0" else calif
+                        clvOficial = clvOficialValue,
+                        materia = json.optString("Materia"),
+                        periodo = periodo,
+                        promedio = if (calif == "null" || calif.isBlank()) "0" else calif
                     )
                 }
                 Result.success(list)
@@ -187,13 +203,19 @@ class SicenetRepository : InterfaceRepository {
             val envelope = CargaEnvelope(CargaBody(GetCargaRequest()))
             val response = api.getCarga("http://tempuri.org/getCargaAcademicaByAlumno", envelope)
             val res = response.body()?.result
+            Log.d("SicenetRepo", "Response: $res")
             if (response.isSuccessful && res != null) {
                 val list = smartParse(res).map { json ->
                     CargaItem(
-                        materia = json.optString("materia", json.optString("Materia", "N/A")),
-                        docente = json.optString("docente", json.optString("Docente", "N/A")),
-                        horario = json.optString("horario", json.optString("Horario", "N/A")),
-                        aula = json.optString("aula", json.optString("Aula", "N/A"))
+                        Materia = json.optString("Materia"),
+                        Grupo = json.optString("Grupo"),
+                        Docente = json.optString("Docente"),
+                        CreditosMateria = json.optInt("CreditosMateria"),
+                        Lunes = json.optString("Lunes"),
+                        Martes = json.optString("Martes"),
+                        Miercoles = json.optString("Miercoles"),
+                        Jueves = json.optString("Jueves"),
+                        Viernes = json.optString("Viernes")
                     )
                 }
                 Result.success(list)

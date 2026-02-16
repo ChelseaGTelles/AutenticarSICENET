@@ -1,5 +1,7 @@
 package com.wiz.sice.data.models
 
+import android.R
+
 data class LoginResult(
     val acceso: Boolean,
     val mensaje: String,
@@ -27,10 +29,15 @@ data class AlumnoProfile(
 )
 
 data class CargaItem(
-    val materia: String = "",
-    val docente: String = "",
-    val horario: String = "",
-    val aula: String = ""
+    val Materia: String = "",
+    val Grupo: String = "",
+    val Docente: String = "",
+    val CreditosMateria: Int = 0,
+    val Lunes: String = "",
+    val Martes: String = "",
+    val Miercoles: String = "",
+    val Jueves: String = "",
+    val Viernes: String = "",
 )
 
 data class KardexItem(
@@ -41,11 +48,15 @@ data class KardexItem(
 )
 
 data class CalifUnidadItem(
-    val materia: String = "",
-    val unidades: Map<Int, String> = emptyMap()
+    val Materia: String = "",
+    val unidades: Map<Int, String> = emptyMap(),
+    val Grupo: String = ""
 )
 
 data class CalifFinalItem(
     val materia: String = "",
-    val calificacionFinal: String = ""
+    val calif: String = "",
+    val acred: String = "",
+    val grupo: String = "",
+    val Observaciones: String = ""
 )

@@ -89,7 +89,7 @@ fun KardexCard(item: KardexItem) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = item.periodo,
+                    text = "Semestre " + item.periodo,
                     fontSize = 12.sp,
                     color = Color(0xFF2E7D32),
                     fontWeight = FontWeight.Medium

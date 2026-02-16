@@ -74,7 +74,9 @@ fun FinalCard(item: CalifFinalItem) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = item.materia, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF062970))
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Calificación Final: ${item.calificacionFinal}", fontSize = 14.sp)
+            Text(text = "Calificación Final: ${item.calif}", fontSize = 14.sp)
+            Text(text = "Acreditación: ${item.acred}", fontSize = 14.sp)
+            Text(text = "Grupo: ${item.grupo}", fontSize = 14.sp)
         }
     }
 }

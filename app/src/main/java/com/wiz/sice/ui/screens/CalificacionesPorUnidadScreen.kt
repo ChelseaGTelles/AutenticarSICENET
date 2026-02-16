@@ -76,13 +76,14 @@ fun UnidadMateriaCard(item: CalifUnidadItem) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = item.materia,
+                text = item.Materia,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color(0xFF062970)
             )
             Spacer(modifier = Modifier.height(8.dp))
-
+            Text(text = "Grupo ${item.Grupo}", fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

@@ -78,15 +78,41 @@ fun CargaCard(item: CargaItem) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = item.materia,
+                text = item.Materia,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color(0xFF062970)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Docente: ${item.docente}", fontSize = 14.sp)
-            Text(text = "Horario: ${item.horario}", fontSize = 12.sp, color = Color.Gray)
-            Text(text = "Aula: ${item.aula}", fontSize = 12.sp, color = Color.Gray)
+            Text(text = "Grupo: ${item.Grupo}", fontSize = 14.sp)
+            Text(text = "Docente: ${item.Docente}", fontSize = 14.sp)
+            Text(text = "Creditos: ${item.CreditosMateria}", fontSize = 12.sp)
+            Text(text = "Horarios", fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    if(!item.Lunes.isNullOrBlank()){
+                        Text(text = "Lunes", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = item.Lunes, fontSize = 14.sp)
+                    }
+                    if(!item.Martes.isNullOrBlank()){
+                        Text(text = "Martes", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = item.Martes, fontSize = 14.sp)
+                    }
+                    if(!item.Miercoles.isNullOrBlank()){
+                        Text(text = "Miercoles", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = item.Miercoles, fontSize = 14.sp)
+                    }
+                    if(!item.Jueves.isNullOrBlank()){
+                        Text(text = "Jueves", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = item.Jueves, fontSize = 14.sp)
+                    }
+                    if(!item.Viernes.isNullOrBlank()){
+                        Text(text = "Viernes", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = item.Viernes, fontSize = 14.sp)
+                    }
+                }
+            }
         }
     }
 }

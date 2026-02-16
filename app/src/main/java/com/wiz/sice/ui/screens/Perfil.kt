@@ -25,7 +25,6 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
     val uiState by viewModel.uiState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
 
-    // Corregido: Llamar a getProfile si no hemos cargado el perfil aún
     LaunchedEffect(Unit) {
         if (uiState !is SicenetUiState.ProfileLoaded) {
             viewModel.getProfile()
@@ -132,21 +131,16 @@ fun ProfileDataDisplay(profile: AlumnoProfile) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            ProfileItem("FechaReins", profile.fechaReins)
-            ProfileItem("ModEducativo", profile.modEducativo)
-            ProfileItem("Adeudo", profile.adeudo.toString())
-            ProfileItem("UrlFoto", profile.urlFoto)
-            ProfileItem("AdeudoDescripcion", profile.adeudoDescripcion)
-            ProfileItem("Inscrito", profile.inscrito.toString())
-            ProfileItem("Estatus", profile.estatus)
+            ProfileItem("Matricula", profile.matricula)
+            ProfileItem("Nombre", profile.nombre)
+            ProfileItem("Carrera", profile.carrera)
+            ProfileItem("Especialidad", profile.especialidad)
             ProfileItem("SemActual", profile.semActual)
             ProfileItem("CdtosAcumulados", profile.cdtosAcumulados)
             ProfileItem("CdtosActuales", profile.cdtosActuales)
-            ProfileItem("Especialidad", profile.especialidad)
-            ProfileItem("Carrera", profile.carrera)
-            ProfileItem("Lineamiento", profile.lineamiento)
-            ProfileItem("Nombre", profile.nombre)
-            ProfileItem("Matricula", profile.matricula)
+            ProfileItem("FechaReins", profile.fechaReins)
+            ProfileItem("Adeudo", if (profile.adeudo) "Sí" else "No")
+            ProfileItem("Inscrito", if (profile.inscrito) "Sí" else "No")
         }
     }
 }

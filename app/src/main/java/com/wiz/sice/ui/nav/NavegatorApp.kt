@@ -26,6 +26,7 @@ fun SicenetApp() {
                 viewModel = viewModel,
                 onNavigate = { route -> navController.navigate(route) },
                 onLogout = {
+                    viewModel.logout()
                     navController.navigate("login") {
                         popUpTo("profile") { inclusive = true }
                     }
