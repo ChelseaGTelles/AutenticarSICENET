@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wiz.sice.data.models.KardexItem
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
-import org.json.JSONArray
-import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,13 +23,13 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getKardex(3) // Asumiendo un valor por defecto para aluLineamiento
+        viewModel.getKardex(3)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Kardex", color = Color.White) },
+                title = { Text("Kardex Académico", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Regresar", tint = Color.White)
@@ -46,22 +46,23 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
                         CircularProgressIndicator()
                     }
                 }
-                is SicenetUiState.DataLoaded -> {
-                    if (state.type == "KARDEX") {
-                        val list = try { JSONArray(state.content) } catch (e: Exception) { null }
-                        if (list != null) {
-                            LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                                items(List(list.length()) { list.getJSONObject(it) }) { item ->
-                                    KardexCard(item)
-                                }
+                is SicenetUiState.KardexLoaded -> {
+                    if (state.items.isNotEmpty()) {
+                        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                            items(state.items) { item ->
+                                KardexCard(item)
                             }
-                        } else {
-                            Text("No se pudieron procesar los datos.")
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(text = "No se encontraron registros en el Kardex.", color = Color.Gray)
                         }
                     }
                 }
                 is SicenetUiState.Error -> {
-                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    }
                 }
                 else -> {}
             }
@@ -70,12 +71,29 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun KardexCard(json: JSONObject) {
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = json.optString("materia"), fontWeight = FontWeight.Bold)
-            Text(text = "Calificación: ${json.optString("calificacion")}")
-            Text(text = "Periodo: ${json.optString("periodo")}")
+fun KardexCard(item: KardexItem) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = item.clvOficial, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                Text(text = item.periodo, fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Medium)
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = item.materia, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF062970))
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Text(text = "Calificación: ", fontSize = 14.sp)
+                Text(
+                    text = item.promedio,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if ((item.promedio.toIntOrNull() ?: 0) >= 70) Color.Black else Color.Red
+                )
+            }
         }
     }
 }

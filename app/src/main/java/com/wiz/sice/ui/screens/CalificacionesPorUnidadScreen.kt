@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wiz.sice.data.models.CalifUnidadItem
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
-import org.json.JSONArray
-import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,22 +46,21 @@ fun CalificacionesPorUnidadScreen(viewModel: SicenetViewModel, onBack: () -> Uni
                         CircularProgressIndicator()
                     }
                 }
-                is SicenetUiState.DataLoaded -> {
-                    if (state.type == "UNIDADES") {
-                        val list = try { JSONArray(state.content) } catch (e: Exception) { null }
-                        if (list != null) {
-                            LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                                items(List(list.length()) { list.getJSONObject(it) }) { item ->
-                                    UnidadCard(item)
-                                }
+                is SicenetUiState.UnidadesLoaded -> {
+                    if (state.items.isNotEmpty()) {
+                        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                            items(state.items) { item ->
+                                UnidadMateriaCard(item)
                             }
-                        } else {
-                            Text("No se pudieron procesar los datos.")
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No se encontraron calificaciones.", color = Color.Gray)
                         }
                     }
                 }
                 is SicenetUiState.Error -> {
-                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    Text(text = state.message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
                 }
                 else -> {}
             }
@@ -70,12 +69,31 @@ fun CalificacionesPorUnidadScreen(viewModel: SicenetViewModel, onBack: () -> Uni
 }
 
 @Composable
-fun UnidadCard(json: JSONObject) {
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
+fun UnidadMateriaCard(item: CalifUnidadItem) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = json.optString("materia"), fontWeight = FontWeight.Bold)
-            Text(text = "Unidad: ${json.optString("unidad")}")
-            Text(text = "Calificación: ${json.optString("calificacion")}")
+            Text(
+                text = item.materia,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color(0xFF062970)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                item.unidades.forEach { (num, calif) ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "U$num", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = calif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                }
+            }
         }
     }
 }

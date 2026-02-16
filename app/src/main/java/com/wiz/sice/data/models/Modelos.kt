@@ -25,3 +25,27 @@ data class AlumnoProfile(
     val lineamiento: String = "",
     val rawJson: String = ""
 )
+
+data class CargaItem(
+    val materia: String = "",
+    val docente: String = "",
+    val horario: String = "",
+    val aula: String = ""
+)
+
+data class KardexItem(
+    val clvOficial: String = "",
+    val materia: String = "",
+    val periodo: String = "",
+    val promedio: String = ""
+)
+
+data class CalifUnidadItem(
+    val materia: String = "",
+    val unidades: Map<Int, String> = emptyMap()
+)
+
+data class CalifFinalItem(
+    val materia: String = "",
+    val calificacionFinal: String = ""
+)

@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.wiz.sice.data.models.CalifFinalItem
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
-import org.json.JSONArray
-import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +23,7 @@ fun CalificacionesFinalesScreen(viewModel: SicenetViewModel, onBack: () -> Unit)
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getCalifFinales(2) // Asumiendo un valor por defecto para modEducativo
+        viewModel.getCalifFinales(2)
     }
 
     Scaffold(
@@ -46,22 +46,21 @@ fun CalificacionesFinalesScreen(viewModel: SicenetViewModel, onBack: () -> Unit)
                         CircularProgressIndicator()
                     }
                 }
-                is SicenetUiState.DataLoaded -> {
-                    if (state.type == "FINALES") {
-                        val list = try { JSONArray(state.content) } catch (e: Exception) { null }
-                        if (list != null) {
-                            LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                                items(List(list.length()) { list.getJSONObject(it) }) { item ->
-                                    FinalCard(item)
-                                }
+                is SicenetUiState.FinalesLoaded -> {
+                    if (state.items.isNotEmpty()) {
+                        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                            items(state.items) { item ->
+                                FinalCard(item)
                             }
-                        } else {
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("No se pudieron procesar los datos.")
                         }
                     }
                 }
                 is SicenetUiState.Error -> {
-                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    Text(text = state.message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp))
                 }
                 else -> {}
             }
@@ -70,11 +69,12 @@ fun CalificacionesFinalesScreen(viewModel: SicenetViewModel, onBack: () -> Unit)
 }
 
 @Composable
-fun FinalCard(json: JSONObject) {
+fun FinalCard(item: CalifFinalItem) {
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = json.optString("materia"), fontWeight = FontWeight.Bold)
-            Text(text = "Calificación Final: ${json.optString("calificacionFinal")}")
+            Text(text = item.materia, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF062970))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "Calificación Final: ${item.calificacionFinal}", fontSize = 14.sp)
         }
     }
 }

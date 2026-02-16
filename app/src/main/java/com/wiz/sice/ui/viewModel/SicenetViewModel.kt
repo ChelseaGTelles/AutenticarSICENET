@@ -3,8 +3,7 @@ package com.wiz.sice.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wiz.sice.data.AccesoLoginRequest
-import com.wiz.sice.data.models.AlumnoProfile
-import com.wiz.sice.data.models.LoginResult
+import com.wiz.sice.data.models.*
 import com.wiz.sice.data.repository.InterfaceRepository
 import com.wiz.sice.data.repository.SicenetRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,10 @@ sealed class SicenetUiState {
     object Loading : SicenetUiState()
     data class Success(val loginResult: LoginResult) : SicenetUiState()
     data class ProfileLoaded(val profile: AlumnoProfile) : SicenetUiState()
-    data class DataLoaded(val type: String, val content: String) : SicenetUiState()
+    data class CargaLoaded(val items: List<CargaItem>) : SicenetUiState()
+    data class KardexLoaded(val items: List<KardexItem>) : SicenetUiState()
+    data class UnidadesLoaded(val items: List<CalifUnidadItem>) : SicenetUiState()
+    data class FinalesLoaded(val items: List<CalifFinalItem>) : SicenetUiState()
     data class Error(val message: String) : SicenetUiState()
 }
 
@@ -41,6 +43,13 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            repository.logout()
+            _uiState.value = SicenetUiState.Idle
+        }
+    }
+
     fun getProfile() {
         viewModelScope.launch {
             _uiState.value = SicenetUiState.Loading
@@ -55,8 +64,8 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
     fun getCarga() {
         viewModelScope.launch {
             _uiState.value = SicenetUiState.Loading
-            repository.getCargaAcademicaByAlumno().onSuccess { result ->
-                _uiState.value = SicenetUiState.DataLoaded("CARGA", result)
+            repository.getCargaAcademicaByAlumno().onSuccess { items ->
+                _uiState.value = SicenetUiState.CargaLoaded(items)
             }.onFailure {
                 _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener carga académica")
             }
@@ -66,8 +75,8 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
     fun getKardex(lineamiento: Int) {
         viewModelScope.launch {
             _uiState.value = SicenetUiState.Loading
-            repository.getAllKardexConPromedioByAlumno(lineamiento).onSuccess { result ->
-                _uiState.value = SicenetUiState.DataLoaded("KARDEX", result)
+            repository.getAllKardexConPromedioByAlumno(lineamiento).onSuccess { items ->
+                _uiState.value = SicenetUiState.KardexLoaded(items)
             }.onFailure {
                 _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener kardex")
             }
@@ -77,8 +86,8 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
     fun getCalifUnidades() {
         viewModelScope.launch {
             _uiState.value = SicenetUiState.Loading
-            repository.getCalifUnidadesByAlumno().onSuccess { result ->
-                _uiState.value = SicenetUiState.DataLoaded("UNIDADES", result)
+            repository.getCalifUnidadesByAlumno().onSuccess { items ->
+                _uiState.value = SicenetUiState.UnidadesLoaded(items)
             }.onFailure {
                 _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener calificaciones por unidad")
             }
@@ -88,8 +97,8 @@ class SicenetViewModel(private val repository: InterfaceRepository = SicenetRepo
     fun getCalifFinales(modEducativo: Int) {
         viewModelScope.launch {
             _uiState.value = SicenetUiState.Loading
-            repository.getAllCalifFinalByAlumnos(modEducativo).onSuccess { result ->
-                _uiState.value = SicenetUiState.DataLoaded("FINALES", result)
+            repository.getAllCalifFinalByAlumnos(modEducativo).onSuccess { items ->
+                _uiState.value = SicenetUiState.FinalesLoaded(items)
             }.onFailure {
                 _uiState.value = SicenetUiState.Error(it.message ?: "Error al obtener calificaciones finales")
             }
