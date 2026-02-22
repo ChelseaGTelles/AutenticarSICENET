@@ -1,24 +1,20 @@
 package com.wiz.sice.data.repository
 
 import com.wiz.sice.data.local.SicenetDatabase
-import com.wiz.sice.data.local.entities.ProfileEntity
-import com.wiz.sice.data.local.entities.SessionEntity
-import com.wiz.sice.data.local.entities.SicenetDataEntity
-import com.wiz.sice.data.models.AlumnoProfile
-import com.wiz.sice.data.models.CargaItem
-import com.wiz.sice.data.models.KardexItem
-import com.wiz.sice.data.models.CalifUnidadItem
-import com.wiz.sice.data.models.CalifFinalItem
-import org.json.JSONArray
+import com.wiz.sice.data.local.entities.*
+import com.wiz.sice.data.models.*
 import org.json.JSONObject
 
-class LocalRepository(private val database: SicenetDatabase) {
+class LocalRepository(private val database: SicenetDatabase) : LocalRepositoryInterface {
 
     private val profileDao = database.profileDao()
-    private val dataDao = database.sicenetDataDao()
     private val sessionDao = database.sessionDao()
+    private val cargaDao = database.cargaDao()
+    private val kardexDao = database.kardexDao()
+    private val califUnidadesDao = database.califUnidadesDao()
+    private val califFinalesDao = database.califFinalesDao()
 
-    suspend fun saveProfile(profile: AlumnoProfile) {
+    override suspend fun saveProfile(profile: AlumnoProfile) {
         profileDao.insertProfile(
             ProfileEntity(
                 matricula = profile.matricula,
@@ -41,7 +37,7 @@ class LocalRepository(private val database: SicenetDatabase) {
         )
     }
 
-    suspend fun getProfile(): AlumnoProfile? {
+    override suspend fun getProfile(): AlumnoProfile? {
         return profileDao.getProfile()?.let {
             AlumnoProfile(
                 matricula = it.matricula,
@@ -65,33 +61,165 @@ class LocalRepository(private val database: SicenetDatabase) {
         }
     }
 
-    suspend fun getProfileLastUpdated(): Long {
+    override suspend fun getProfileLastUpdated(): Long {
         return profileDao.getProfile()?.lastUpdated ?: 0L
     }
 
-    suspend fun saveData(type: String, content: String) {
-        dataDao.insertData(SicenetDataEntity(dataType = type, content = content))
+    override suspend fun saveCarga(items: List<CargaItem>) {
+        val entities = items.map { item ->
+            CargaEntity(
+                materia = item.Materia,
+                grupo = item.Grupo,
+                docente = item.Docente,
+                creditosMateria = item.CreditosMateria,
+                lunes = item.Lunes,
+                martes = item.Martes,
+                miercoles = item.Miercoles,
+                jueves = item.Jueves,
+                viernes = item.Viernes
+            )
+        }
+        cargaDao.clearCarga()
+        cargaDao.insertAll(entities)
     }
 
-    suspend fun getData(type: String): String? {
-        return dataDao.getDataByType(type)?.content
+    override suspend fun getCarga(): List<CargaItem>? {
+        val entities = cargaDao.getAllCarga()
+        return if (entities.isNotEmpty()) {
+            entities.map { entity ->
+                CargaItem(
+                    Materia = entity.materia,
+                    Grupo = entity.grupo,
+                    Docente = entity.docente,
+                    CreditosMateria = entity.creditosMateria,
+                    Lunes = entity.lunes,
+                    Martes = entity.martes,
+                    Miercoles = entity.miercoles,
+                    Jueves = entity.jueves,
+                    Viernes = entity.viernes
+                )
+            }
+        } else null
     }
 
-    suspend fun getDataLastUpdated(type: String): Long {
-        return dataDao.getDataByType(type)?.lastUpdated ?: 0L
+    override suspend fun saveKardex(items: List<KardexItem>) {
+        val entities = items.map { item ->
+            KardexEntity(
+                clvOficial = item.clvOficial,
+                materia = item.materia,
+                periodo = item.periodo,
+                promedio = item.promedio
+            )
+        }
+        kardexDao.clearKardex()
+        kardexDao.insertAll(entities)
     }
 
-    suspend fun saveSession(matricula: String, contrasenia: String, tipoUsuario: String) {
+    override suspend fun getKardex(): List<KardexItem>? {
+        val entities = kardexDao.getAllKardex()
+        return if (entities.isNotEmpty()) {
+            entities.map { entity ->
+                KardexItem(
+                    clvOficial = entity.clvOficial,
+                    materia = entity.materia,
+                    periodo = entity.periodo,
+                    promedio = entity.promedio
+                )
+            }
+        } else null
+    }
+
+    override suspend fun saveCalifUnidades(items: List<CalifUnidadItem>) {
+        val entities = items.map { item ->
+            val unitsJson = JSONObject()
+            item.unidades.forEach { (key, value) ->
+                unitsJson.put(key.toString(), value)
+            }
+            CalifUnidadesEntity(
+                materia = item.Materia,
+                grupo = item.Grupo,
+                unidades = unitsJson.toString()
+            )
+        }
+        califUnidadesDao.clearCalifUnidades()
+        califUnidadesDao.insertAll(entities)
+    }
+
+    override suspend fun getCalifUnidades(): List<CalifUnidadItem>? {
+        val entities = califUnidadesDao.getAllCalifUnidades()
+        return if (entities.isNotEmpty()) {
+            entities.map { entity ->
+                val unitsMap = mutableMapOf<Int, String>()
+                try {
+                    val unitsObj = JSONObject(entity.unidades)
+                    unitsObj.keys().forEach { key ->
+                        unitsMap[key.toInt()] = unitsObj.getString(key)
+                    }
+                } catch (_: Exception) { }
+                CalifUnidadItem(
+                    Materia = entity.materia,
+                    Grupo = entity.grupo,
+                    unidades = unitsMap
+                )
+            }
+        } else null
+    }
+
+    override suspend fun saveCalifFinales(items: List<CalifFinalItem>) {
+        val entities = items.map { item ->
+            CalifFinalesEntity(
+                materia = item.materia,
+                calif = item.calif,
+                acred = item.acred,
+                grupo = item.grupo,
+                observaciones = item.Observaciones
+            )
+        }
+        califFinalesDao.clearCalifFinales()
+        califFinalesDao.insertAll(entities)
+    }
+
+    override suspend fun getCalifFinales(): List<CalifFinalItem>? {
+        val entities = califFinalesDao.getAllCalifFinales()
+        return if (entities.isNotEmpty()) {
+            entities.map { entity ->
+                CalifFinalItem(
+                    materia = entity.materia,
+                    calif = entity.calif,
+                    acred = entity.acred,
+                    grupo = entity.grupo,
+                    Observaciones = entity.observaciones
+                )
+            }
+        } else null
+    }
+
+    override suspend fun getDataLastUpdated(type: String): Long {
+        return when (type) {
+            "CARGA" -> cargaDao.getLastUpdated() ?: 0L
+            "KARDEX" -> kardexDao.getLastUpdated() ?: 0L
+            "CALIF_UNIDADES" -> califUnidadesDao.getLastUpdated() ?: 0L
+            "CALIF_FINALES" -> califFinalesDao.getLastUpdated() ?: 0L
+            else -> 0L
+        }
+    }
+
+    override suspend fun saveSession(matricula: String, contrasenia: String, tipoUsuario: String) {
         sessionDao.insertSession(SessionEntity(matricula = matricula, contrasenia = contrasenia, tipoUsuario = tipoUsuario))
     }
 
-    suspend fun getSession(): SessionEntity? {
+    override suspend fun getSession(): SessionEntity? {
         return sessionDao.getSession()
     }
 
-    suspend fun clearAll() {
+    override suspend fun clearAll() {
         profileDao.clearProfile()
-        dataDao.clearAllData()
         sessionDao.clearSession()
+        cargaDao.clearCarga()
+        kardexDao.clearKardex()
+        califUnidadesDao.clearCalifUnidades()
+        califFinalesDao.clearCalifFinales()
     }
 }
+
+

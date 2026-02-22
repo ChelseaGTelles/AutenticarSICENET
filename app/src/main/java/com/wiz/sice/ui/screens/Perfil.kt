@@ -106,6 +106,19 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
                         }
                     }
                     is SicenetUiState.ProfileLoaded -> {
+                        if (state.fromCache && !state.lastUpdated.isNullOrEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4))
+                            ) {
+                                Text(
+                                    text = "Datos guardados, última actualización: ${state.lastUpdated}",
+                                    modifier = Modifier.padding(12.dp),
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF827717)
+                                )
+                            }
+                        }
                         ProfileDataDisplay(state.profile)
                     }
                     is SicenetUiState.Error -> {

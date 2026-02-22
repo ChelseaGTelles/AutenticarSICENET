@@ -1,7 +1,5 @@
 package com.wiz.sice.data.models
 
-import android.R
-
 data class LoginResult(
     val acceso: Boolean,
     val mensaje: String,

@@ -128,8 +128,7 @@ class SicenetRepository : InterfaceRepository {
                         calif = if (calif == "null" || calif.isEmpty()) "0" else calif,
                         acred = json.optString("acred"),
                         grupo = json.optString("grupo"),
-                        Observaciones = json.optString(json.optString("Observaciones")
-                        )
+                        Observaciones = json.optString("Observaciones")
                     )
                 }
                 Result.success(list)

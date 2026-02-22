@@ -8,14 +8,26 @@ import com.wiz.sice.data.local.dao.*
 import com.wiz.sice.data.local.entities.*
 
 @Database(
-    entities = [ProfileEntity::class, SicenetDataEntity::class, SessionEntity::class],
-    version = 1,
+    entities = [
+        ProfileEntity::class,
+        SicenetDataEntity::class,
+        SessionEntity::class,
+        CargaEntity::class,
+        KardexEntity::class,
+        CalifUnidadesEntity::class,
+        CalifFinalesEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class SicenetDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
     abstract fun sicenetDataDao(): SicenetDataDao
     abstract fun sessionDao(): SessionDao
+    abstract fun cargaDao(): CargaDao
+    abstract fun kardexDao(): KardexDao
+    abstract fun califUnidadesDao(): CalifUnidadesDao
+    abstract fun califFinalesDao(): CalifFinalesDao
 
     companion object {
         @Volatile
@@ -27,7 +39,9 @@ abstract class SicenetDatabase : RoomDatabase() {
                     context.applicationContext,
                     SicenetDatabase::class.java,
                     "sicenet_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

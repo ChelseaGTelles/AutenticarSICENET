@@ -47,15 +47,30 @@ fun CalificacionesFinalesScreen(viewModel: SicenetViewModel, onBack: () -> Unit)
                     }
                 }
                 is SicenetUiState.FinalesLoaded -> {
-                    if (state.items.isNotEmpty()) {
-                        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                            items(state.items) { item ->
-                                FinalCard(item)
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (state.fromCache && !state.lastUpdated.isNullOrEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp, 8.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4))
+                            ) {
+                                Text(
+                                    text = "Datos guardados, última actualización: ${state.lastUpdated}",
+                                    modifier = Modifier.padding(12.dp),
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF827717)
+                                )
                             }
                         }
-                    } else {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No se pudieron procesar los datos.")
+                        if (state.items.isNotEmpty()) {
+                            LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                items(state.items) { item ->
+                                    FinalCard(item)
+                                }
+                            }
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No se pudieron procesar los datos.")
+                            }
                         }
                     }
                 }

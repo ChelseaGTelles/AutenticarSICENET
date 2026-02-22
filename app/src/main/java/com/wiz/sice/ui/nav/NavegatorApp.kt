@@ -1,17 +1,22 @@
 package com.wiz.sice.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.wiz.sice.ui.screens.*
 import com.wiz.sice.ui.viewModel.SicenetViewModel
+import com.wiz.sice.ui.viewModel.SicenetViewModelFactory
 
 @Composable
 fun SicenetApp() {
     val navController = rememberNavController()
-    val viewModel: SicenetViewModel = viewModel()
+    val context = LocalContext.current
+    val viewModel: SicenetViewModel = viewModel(
+        factory = SicenetViewModelFactory(context.applicationContext as android.app.Application)
+    )
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {

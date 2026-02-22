@@ -47,19 +47,34 @@ fun KardexScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
                     }
                 }
                 is SicenetUiState.KardexLoaded -> {
-                    if (state.items.isNotEmpty()) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(state.items) { item ->
-                                KardexCard(item)
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (state.fromCache && !state.lastUpdated.isNullOrEmpty()) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp, 8.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4))
+                            ) {
+                                Text(
+                                    text = "Datos guardados, última actualización: ${state.lastUpdated}",
+                                    modifier = Modifier.padding(12.dp),
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF827717)
+                                )
                             }
                         }
-                    } else {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No se encontraron registros en el Kardex.", color = Color.Gray)
+                        if (state.items.isNotEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(state.items) { item ->
+                                    KardexCard(item)
+                                }
+                            }
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No se encontraron registros en el Kardex.", color = Color.Gray)
+                            }
                         }
                     }
                 }
