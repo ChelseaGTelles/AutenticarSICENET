@@ -1,5 +1,6 @@
 package com.wiz.sice.data.local.dao
 
+import android.database.Cursor
 import androidx.room.*
 import com.wiz.sice.data.local.entities.*
 
@@ -44,14 +45,26 @@ interface CargaDao {
     @Query("SELECT * FROM carga_academica ORDER BY materia")
     suspend fun getAllCarga(): List<CargaEntity>
 
+    @Query("SELECT * FROM carga_academica")
+    fun getAllCargaCursor(): Cursor
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<CargaEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(item: CargaEntity): Long
 
     @Query("DELETE FROM carga_academica")
     suspend fun clearCarga()
 
+    @Query("DELETE FROM carga_academica WHERE id = :id")
+    fun deleteById(id: Long): Int
+
     @Query("SELECT lastUpdated FROM carga_academica LIMIT 1")
     suspend fun getLastUpdated(): Long?
+
+    @Query("SELECT * FROM carga_academica WHERE id = :id LIMIT 1")
+    fun getById(id: Int): CargaEntity?
 }
 
 @Dao
@@ -59,14 +72,26 @@ interface KardexDao {
     @Query("SELECT * FROM kardex ORDER BY periodo DESC")
     suspend fun getAllKardex(): List<KardexEntity>
 
+    @Query("SELECT * FROM kardex")
+    fun getAllKardexCursor(): Cursor
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<KardexEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(item: KardexEntity): Long
 
     @Query("DELETE FROM kardex")
     suspend fun clearKardex()
 
+    @Query("DELETE FROM kardex WHERE id = :id")
+    fun deleteById(id: Long): Int
+
     @Query("SELECT lastUpdated FROM kardex LIMIT 1")
     suspend fun getLastUpdated(): Long?
+
+    @Query("SELECT * FROM kardex WHERE id = :id LIMIT 1")
+    fun getById(id: Int): KardexEntity?
 }
 
 @Dao
@@ -98,4 +123,3 @@ interface CalifFinalesDao {
     @Query("SELECT lastUpdated FROM calif_finales LIMIT 1")
     suspend fun getLastUpdated(): Long?
 }
-
