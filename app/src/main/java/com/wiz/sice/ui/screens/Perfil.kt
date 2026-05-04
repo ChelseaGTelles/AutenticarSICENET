@@ -1,12 +1,11 @@
 package com.wiz.sice.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +22,6 @@ import com.wiz.sice.ui.viewModel.SicenetViewModel
 @Composable
 fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLogout: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
-    var showMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (uiState !is SicenetUiState.ProfileLoaded) {
@@ -34,7 +32,7 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil", color = Color.White) },
+                title = { Text("Mi Perfil", color = Color.White, fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(
@@ -43,47 +41,46 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
                             tint = Color.White
                         )
                     }
-                    
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Menú", tint = Color.White)
-                    }
-                    
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Calificaciones Por Unidad") },
-                            onClick = {
-                                showMenu = false
-                                onNavigate("calificaciones_unidad")
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Calificaciones Finales") },
-                            onClick = {
-                                showMenu = false
-                                onNavigate("calificaciones_finales")
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Kardex") },
-                            onClick = {
-                                showMenu = false
-                                onNavigate("kardex")
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Carga Académica") },
-                            onClick = {
-                                showMenu = false
-                                onNavigate("carga_academica")
-                            }
-                        )
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF062970))
             )
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color.White,
+                tonalElevation = 8.dp
+            ) {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    label = { Text("Perfil", fontSize = 10.sp) },
+                    selected = true,
+                    onClick = { /* Ya estamos aquí */ }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.List, contentDescription = null) },
+                    label = { Text("Unidades", fontSize = 10.sp) },
+                    selected = false,
+                    onClick = { onNavigate("calificaciones_unidad") }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
+                    label = { Text("Finales", fontSize = 10.sp) },
+                    selected = false,
+                    onClick = { onNavigate("calificaciones_finales") }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    label = { Text("Kardex", fontSize = 10.sp) },
+                    selected = false,
+                    onClick = { onNavigate("kardex") }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
+                    label = { Text("Carga", fontSize = 10.sp) },
+                    selected = false,
+                    onClick = { onNavigate("carga_academica") }
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -102,13 +99,15 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
                 when (val state = uiState) {
                     is SicenetUiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = Color(0xFF062970))
                         }
                     }
                     is SicenetUiState.ProfileLoaded -> {
                         if (state.fromCache && !state.lastUpdated.isNullOrEmpty()) {
                             Card(
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4))
                             ) {
                                 Text(
@@ -122,10 +121,17 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
                         ProfileDataDisplay(state.profile)
                     }
                     is SicenetUiState.Error -> {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Text(text = state.message, color = MaterialTheme.colorScheme.error)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.getProfile() }) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { viewModel.getProfile() },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF062970))
+                            ) {
                                 Text("Reintentar")
                             }
                         }
@@ -141,19 +147,26 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
 fun ProfileDataDisplay(profile: AlumnoProfile) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            ProfileItem("Matricula", profile.matricula)
+            Text(
+                text = "Información Académica",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color(0xFF062970),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            ProfileItem("Matrícula", profile.matricula)
             ProfileItem("Nombre", profile.nombre)
             ProfileItem("Carrera", profile.carrera)
             ProfileItem("Especialidad", profile.especialidad)
-            ProfileItem("SemActual", profile.semActual)
-            ProfileItem("CdtosAcumulados", profile.cdtosAcumulados)
-            ProfileItem("CdtosActuales", profile.cdtosActuales)
-            ProfileItem("FechaReins", profile.fechaReins)
-            ProfileItem("Adeudo", if (profile.adeudo) "Sí" else "No")
-            ProfileItem("Inscrito", if (profile.inscrito) "Sí" else "No")
+            ProfileItem("Semestre Actual", profile.semActual)
+            ProfileItem("Créditos Acumulados", profile.cdtosAcumulados)
+            ProfileItem("Créditos Actuales", profile.cdtosActuales)
+            ProfileItem("Fecha Reinscripción", profile.fechaReins)
+            ProfileItem("¿Tiene Adeudo?", if (profile.adeudo) "Sí" else "No")
+            ProfileItem("¿Está Inscrito?", if (profile.inscrito) "Sí" else "No")
         }
     }
 }
@@ -163,19 +176,23 @@ fun ProfileItem(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            modifier = Modifier.weight(0.4f)
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = Color.Gray,
+            modifier = Modifier.weight(0.45f)
         )
         Text(
             text = value,
-            fontSize = 16.sp,
-            modifier = Modifier.weight(0.6f)
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black,
+            modifier = Modifier.weight(0.55f)
         )
     }
-    HorizontalDivider()
+    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 }
