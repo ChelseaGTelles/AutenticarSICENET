@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wiz.sice.data.models.AlumnoProfile
+import com.wiz.sice.ui.components.SicenetBottomBar
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
 
@@ -46,41 +47,7 @@ fun PerfilScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onLo
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color.White,
-                tonalElevation = 8.dp
-            ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = null) },
-                    label = { Text("Perfil", fontSize = 10.sp) },
-                    selected = true,
-                    onClick = { /* Ya estamos aquí */ }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.List, contentDescription = null) },
-                    label = { Text("Unidades", fontSize = 10.sp) },
-                    selected = false,
-                    onClick = { onNavigate("calificaciones_unidad") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
-                    label = { Text("Finales", fontSize = 10.sp) },
-                    selected = false,
-                    onClick = { onNavigate("calificaciones_finales") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Email, contentDescription = null) },
-                    label = { Text("Kardex", fontSize = 10.sp) },
-                    selected = false,
-                    onClick = { onNavigate("kardex") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                    label = { Text("Carga", fontSize = 10.sp) },
-                    selected = false,
-                    onClick = { onNavigate("carga_academica") }
-                )
-            }
+            SicenetBottomBar(currentRoute = "profile", onNavigate = onNavigate)
         }
     ) { padding ->
         Column(

@@ -14,12 +14,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.wiz.sice.data.models.CargaItem
+import com.wiz.sice.ui.components.SicenetBottomBar
 import com.wiz.sice.ui.viewModel.SicenetUiState
 import com.wiz.sice.ui.viewModel.SicenetViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CargaAcademicaScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
+fun CargaAcademicaScreen(viewModel: SicenetViewModel, onNavigate: (String) -> Unit, onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -37,6 +38,9 @@ fun CargaAcademicaScreen(viewModel: SicenetViewModel, onBack: () -> Unit) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF062970))
             )
+        },
+        bottomBar = {
+            SicenetBottomBar(currentRoute = "carga_academica", onNavigate = onNavigate)
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
